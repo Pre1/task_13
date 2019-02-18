@@ -1,19 +1,51 @@
 from django.shortcuts import render, redirect
-from .models import Restaurant, Item
+from .models import Restaurant, Item, FavoriteRestaurant
 from .forms import RestaurantForm, ItemForm, SignupForm, SigninForm
 from django.contrib.auth import login, authenticate, logout
 from django.db.models import Q
 
+from django.http import JsonResponse
+
+
 # This view will be used to favorite a restaurant
 def restaurant_favorite(request, restaurant_id):
-    
-    return
+    if request.user.is_anonymous:
+        return redirect('signin')
+
+    restaurant = Restaurant.objects.get(id = restaurant_id)
+    print("==============================")
+
+    fav_rest, created = FavoriteRestaurant.objects.get_or_create(user=request.user, restaurant=restaurant)
+
+    if created:
+        faved = True
+    else:
+        faved = False
+        fav_rest.delete()
+
+    data = {
+        'faved': faved
+    }
+
+    return JsonResponse(data)
 
 
 # This view will be used to display only restaurants a user has favorited
 def favorite_restaurants(request):
-    
-    return
+    if request.user.is_anonymous:
+        return redirect('signin')
+        
+    favorited_rests = FavoriteRestaurant.objects.filter(user=request.user)
+
+    # print("====================================")
+    print("favorited_rests:", favorited_rests)
+    # print("first favorited_name:", favorited_rests[0].restaurant.name)
+
+    context = {
+        "favorited_rests": favorited_rests
+    }
+
+    return render(request, "favorite_restaurants.html", context)
 
 
 def no_access(request):
@@ -72,8 +104,15 @@ def restaurant_list(request):
             Q(owner__username__icontains=query)
         ).distinct()
         #############
+    favorited_rests = []
+    if not request.user.is_anonymous :
+        favorited_rests = FavoriteRestaurant.objects.filter(user=request.user).values_list('restaurant_id', flat=True)
+        
+    
+
     context = {
-       "restaurants": restaurants
+       "restaurants": restaurants,
+       "favorited_rests": favorited_rests,
     }
     return render(request, 'list.html', context)
 
