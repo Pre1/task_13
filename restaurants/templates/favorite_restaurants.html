@@ -23,14 +23,6 @@
             <img class="card-img-top" src="{{obj.restaurant.logo.url}}" alt="Hey Noob, look at me...">
           {% endif %}
           <div class="card-body">
-            
-            {# HERE #}
-            <button id="{{obj.restaurant.id}}" class="btn btn-dark {% if obj.restaurant.id in favorited_rests %}text-danger{% endif %}" onClick="like_me({{obj.restaurant.id}})">
-
-              <i class="fas fa-heart"></i>
-
-            </button>
-
 
             <h5 class="card-title">{{obj.restaurant.name}}</h5>
             <p class="card-text">{{obj.restaurant.description|truncatechars:25}}</p>
@@ -41,6 +33,13 @@
 
                 <a href="{% url 'restaurant-detail' obj.id %}" class="btn btn-outline-dark">View</a>
             </li>
+
+              <button id="{{obj.restaurant.id}}" class="btn btn-dark {% if obj.restaurant.id in favorited_rests %}text-danger{% endif %}" onClick="like_me({{obj.restaurant.id}})">
+
+                <i class="fas fa-coffee"></i>
+
+              </button>
+
           </ul>
         </div>
     </div>
